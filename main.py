@@ -155,10 +155,6 @@ def olivia_fft_conv2d(x: np.array, h:np.array) -> np.array:
     pad_down = pad_y - pad_up
 
     h_padded=np.pad(h, ((pad_right, pad_left), (pad_up, pad_down)), 'constant', constant_values=0)
-    print("this was h originally:", h)
-    print("this is h after padding:", h_padded)
-    print("This is the shape of x", np.shape(x))
-    print("This is the shape of h", np.shape(h))
 
     # 2D FFT. We first swap the axis of X, so that it goes from [H, W, C] to [C, H, W].
     # This is in accordance to the documentation for np.fft.fft2
@@ -166,8 +162,6 @@ def olivia_fft_conv2d(x: np.array, h:np.array) -> np.array:
     x_swapped_axis = np.moveaxis(x, -1, 0)
     X = np.fft.fft2(x_swapped_axis)  # dimensions CxHxW, because Channels unimportant rn
     H = np.fft.fft2(h_padded)  # h_padded is already dimensions HxW
-    print("This is the shape of X", np.shape(X))
-    print("This is the shape of H", np.shape(H))
 
     # visualizations are important!
     ###### When viewing X and H, be cognizant of two things: 
@@ -181,13 +175,11 @@ def olivia_fft_conv2d(x: np.array, h:np.array) -> np.array:
     # Convolution theorem: FT{response} = FT{signal} x TRANSFER FUNCTION
     ####### We want H to be the same dimensions as X so that we can do element-wise multiplication. 
     ####### Note that this is NOT matrix multiplication. Numpy has different syntax for that. 
-    print("This is the shape of X", np.shape(X))
-    print("This is the shape of H", np.shape(H))
     
     Y = X * H[None,:,:]   #
 
     # Inverse transform!
-    y= np.fft.fft2(Y)
+    y= np.fft.ifft2(Y)
 
     # This part will shift all the frequencies back to the right place, since discrete fourier transforms are not centered around the origin. Uncommenting this equation will result in shifted colours in the resulting image
     ###### Remember that it is still C, H, W. We want to shift the frequencies back to normal so that our colors appear normally.
@@ -217,10 +209,10 @@ def main():
     # Comment this out if you don't want to wait 10 minutes....
     #result = convolve2d(img, h_gaussian)
     #view_image(result, "convolution of kernel with image")
-
+    '''
     result = fft_conv2d(img, h_gaussian)
     view_image(result)
-
+    '''
     ################ Olivia Testing Zone!
     result= olivia_fft_conv2d(img, h_gaussian)
     view_image(result, "Olivia's final image")
